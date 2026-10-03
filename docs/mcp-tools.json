@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Freshdesk Agent Connector MCP Tools",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) compliant tool definitions for the Razorpay Freshdesk Merchant Support Connector.",
+  "tools": [
+    {
+      "name": "list_tickets",
+      "description": "Retrieve a paginated list of Freshdesk support tickets with optional filtering by status (open, pending, resolved, closed) and priority (low, medium, high, urgent).",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for pagination (starts at 1)."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Number of tickets per page (max 100)."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "pending", "resolved", "closed", "all"],
+            "description": "Filter by ticket status."
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "urgent"],
+            "description": "Filter by ticket priority."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "subject": { "type": "string" },
+                "status": { "type": "string" },
+                "priority": { "type": "string" },
+                "requester": { "type": "object" },
+                "created_at": { "type": "string" }
+              }
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "integer" },
+              "per_page": { "type": "integer" },
+              "has_more": { "type": "boolean" },
+              "total_count": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "get_ticket",
+      "description": "Retrieve the comprehensive details and normalized fields of a specific Freshdesk support ticket by its numeric ID.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "integer",
+            "description": "The unique numeric ID of the Freshdesk ticket."
+          }
+        },
+        "required": ["ticket_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "subject": { "type": "string" },
+          "description_text": { "type": "string" },
+          "status": { "type": "string" },
+          "priority": { "type": "string" },
+          "requester": { "type": "object" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "created_at": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
+        "required": ["id", "subject", "status", "priority", "requester", "created_at", "updated_at"]
+      }
+    },
+    {
+      "name": "search_tickets",
+      "description": "Search Freshdesk support tickets by keyword, subject text, customer query, or tag (e.g., 'payment failed', 'refund', 'upi'). Returns normalized matching tickets.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search keyword, phrase, or Freshdesk query string (e.g., 'payment failed', 'refund', 'status:2')."
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for search results."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20,
+            "description": "Number of tickets per page (max 100)."
+          }
+        },
+        "required": ["query"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array" },
+          "pagination": { "type": "object" }
+        }
+      }
+    },
+    {
+      "name": "list_ticket_conversations",
+      "description": "Retrieve the chronologically ordered conversation thread and replies exchanged between merchant/customer and support agents for a specific Freshdesk ticket.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "integer",
+            "description": "The unique numeric ID of the ticket whose conversation thread should be retrieved."
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "Page number for conversation messages."
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50,
+            "description": "Number of messages per page."
+          }
+        },
+        "required": ["ticket_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array" },
+          "pagination": { "type": "object" }
+        }
+      }
+    },
+    {
+      "name": "get_ticket_summary",
+      "description": "Generate an executive summary of a Freshdesk support ticket, including root cause, customer sentiment, referenced payment IDs, key discussion points, and suggested next steps.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": {
+            "type": "integer",
+            "description": "The unique numeric ID of the ticket to summarize."
+          }
+        },
+        "required": ["ticket_id"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ticket_id": { "type": "integer" },
+          "subject": { "type": "string" },
+          "status": { "type": "string" },
+          "priority": { "type": "string" },
+          "customer": { "type": "object" },
+          "summary": { "type": "string" },
+          "key_points": { "type": "array", "items": { "type": "string" } },
+          "conversation_count": { "type": "integer" },
+          "last_updated": { "type": "string" },
+          "sentiment": { "type": "string" },
+          "suggested_next_steps": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["ticket_id", "subject", "status", "priority", "customer", "summary", "key_points", "conversation_count", "last_updated"]
+      }
+    }
+  ]
+}

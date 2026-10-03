@@ -1,0 +1,6 @@
+{
+  "name": "Freshdesk Agent Connector",
+  "description": "Production-grade MCP-powered merchant support connector for Freshdesk with rate limiting, Zod validation, and pluggable providers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
